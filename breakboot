@@ -28,7 +28,6 @@ RED() { echo -e "${cR}${@}${c0}"; }
 USAGE() {
   echo -e "${cB}Usage: ${0##*/} TOKEN${c0}
 Download and launch a cantboot setup script based on TOKEN
-
 Please note that the sole purpose of this app is to ${cR}BREAK YOUR SYSTEM${c0} and make
 it ${cR}UNBOOTABLE${c0}. Use at your own risk, and preferably on a virtual machine."
 }
@@ -53,14 +52,14 @@ trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT
 cd ${TMPDIR}
 
 echo "Inspecting TOKEN and attempting download ..."
-if curl -Lsko breakscript https://github.com/ryran/cantboot/blob/master/breaks/"${1}"; then
+if curl -Lsko breakscript https://raw.githubusercontent.com/ryran/cantboot/master/breaks/"${1}"; then
   if file breakscript | grep -qs 'Bourne-Again shell script'; then
     echo "Break script payload downloaded intact; executing ..."
     bash breakscript
   else
     RED "Problem downloading break script; received file not as expected"
     read -ep "Press Ctrl-c to quit or Enter to see received file "
-    cat breakscript
+    less -S breakscript
     exit 1
   fi
 else
