@@ -1,0 +1,15 @@
+#!/bin/bash
+# Swap LV renamed (fix kernel cmdline)
+
+stderr_file=$(mktemp -p ${parent})
+# Redirect stderr to temp file
+exec 7>&2 2>$stderr_file
+eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name $(awk '$3=="swap" {print $1; exit}' /etc/fstab))
+if ! lvrename ${LVM2_VG_NAME}/${LVM2_LV_NAME} ${LVM2_VG_NAME}/${LVM2_LV_NAME}1 >/dev/null; then
+  echo -e "${cR}Aborted setting up this break due to unexpected error${c0}"
+  echo -e "($stderr_file)"
+  exit 1
+fi
+sed -i "s,${LVM2_VG_NAME}.${LVM2_LV_NAME},&1," /etc/fstab
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot

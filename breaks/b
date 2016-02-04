@@ -1,0 +1,26 @@
+#!/bin/bash
+# Root LV snapshot present; dm-snapshot module missing from initramfs
+
+if ! ls /boot/initramfs* &>/dev/null; then
+  echo -e "${cR}This break is meant for RHEL6 and above${c0}"
+  exit 1
+fi
+
+stderr_file=$(mktemp -p ${parent})
+# Redirect stderr to temp file
+exec 7>&2 2>$stderr_file
+
+{ 
+eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name $(awk '$3=="swap" {print $1; exit}' /etc/fstab))
+swapoff /dev/${LVM2_VG_NAME}/${LVM2_LV_NAME}
+lvreduce -fL -128M ${LVM2_VG_NAME}/${LVM2_LV_NAME}
+mkswap /dev/${LVM2_VG_NAME}/${LVM2_LV_NAME}
+eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name $(findmnt -fno SOURCE /))
+lvcreate -l100%FREE -n ${LVM2_LV_NAME}s -s ${LVM2_VG_NAME}/${LVM2_LV_NAME}
+echo omit_drivers+=dm-snapshot >>/etc/dracut.conf
+mv /boot/initramfs-$(uname -r).img{,.old}
+dracut
+} >/dev/null
+
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot

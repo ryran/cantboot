@@ -1,0 +1,23 @@
+#!/bin/bash
+# Missing GRUBv1 stage 1
+
+if [[ -d /boot/grub2 ]]; then
+  echo -e "${cR}This break is meant for RHEL6 and below only${c0}"
+  exit 1
+fi
+stderr_file=$(mktemp -p ${parent})
+# Redirect stderr to temp file
+exec 7>&2 2>$stderr_file
+
+# This is not foolproof (just quick and dirty)
+bootpart=$(findmnt -fno source /boot)
+if ! dd if=${bootpart%1} count=1 | file - | grep -q 'x86 boot sector; GRand Unified Bootloader, stage1'; then
+  echo -e "${cR}Aborted setting up this break due to failed condition check${c0}"
+  echo -e "($stderr_file)"
+  exit 1
+fi
+
+dd if=/dev/urandom of=${bootpart%1} bs=1 count=440
+
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot

@@ -1,0 +1,8 @@
+#!/bin/bash
+# Missing GRUB config files (but backups present)
+ 
+for f in /boot/grub/grub.conf /boot/grub2/grub.cfg; do
+  mv $f $f.old 2>/dev/null
+done
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot

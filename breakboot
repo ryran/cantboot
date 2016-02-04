@@ -1,0 +1,71 @@
+#!/bin/bash
+# cantboot breakboot v0.1.1 last mod 2016/02/04
+# Latest version at <https://github.com/ryran/cantboot>
+# Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+#    General Public License <gnu.org/licenses/gpl.html> for more details.
+#
+# In fact, this program's sole purpose is to cause boot problems.
+# Use at your own risk and preferably on a virtual machine.
+#-------------------------------------------------------------------------------
+
+# Colors
+c0='\033[0;0m'
+cB='\033[1;1m'
+cR='\033[1;31m'
+export c0 cB cR
+
+RED() { echo -e "${cR}${@}${c0}"; }
+
+USAGE() {
+  echo -e "${cB}Usage: ${0##*/} TOKEN${c0}
+Download and launch a cantboot setup script based on TOKEN
+
+Please note that the sole purpose of this app is to ${cR}BREAK YOUR SYSTEM${c0} and make
+it ${cR}UNBOOTABLE${c0}. Use at your own risk, and preferably on a virtual machine."
+}
+
+if [[ ${#} -eq 0 || ${1} == -h || ${1} == --help ]]; then
+  USAGE
+  exit
+elif [[ ${#} -gt 1 ]]; then
+  RED "Invalid token"
+  USAGE
+  exit 1
+elif [[ $(id -u) != 0 ]]; then
+  RED "Must be run as root"
+  exit 1
+fi
+
+# Create sub tempdir in /dev/shm (tons of bash constructs use TMPDIR)
+[[ -d /dev/shm && -w /dev/shm ]] && parent=/dev/shm || parent=/tmp
+export parent TMPDIR=$(mktemp -d -p ${parent})
+# Remove temp dir when we're done
+trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT
+cd ${TMPDIR}
+
+echo "Inspecting TOKEN and attempting download ..."
+if curl -Lsko breakscript https://github.com/ryran/cantboot/blob/master/breaks/"${1}"; then
+  if file breakscript | grep -qs 'Bourne-Again shell script'; then
+    echo "Break script payload downloaded intact; executing ..."
+    bash breakscript
+  else
+    RED "Problem downloading break script; received file not as expected"
+    read -ep "Press Ctrl-c to quit or Enter to see received file "
+    cat breakscript
+    exit 1
+  fi
+else
+  RED "Problem downloading break script; curl command failed"
+  echo "Are you sure you input a valid TOKEN?"
+  exit 1
+fi
+    

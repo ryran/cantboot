@@ -1,0 +1,12 @@
+#!/bin/bash
+# Missing GRUBv1 stage 2
+
+if [[ ! -f /boot/grub/stage2 ]]; then
+  echo -e "${cR}This break is meant for RHEL6 and below only${c0}"
+  exit 1
+fi
+
+shred --remove --zero /boot/grub/stage2
+
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot

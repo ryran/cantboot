@@ -1,0 +1,9 @@
+#!/bin/bash
+# Typo in selinux/config; missing policy
+ 
+cat >/etc/selinux/config <<EOF
+SELINUX=enforcing
+SELINUXTYPE=permissive
+EOF
+echo -e "${cB}Done. Reboot time.${c0}"
+reboot
