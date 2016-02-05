@@ -1,26 +1,54 @@
 #!/bin/bash
-# Root LV snapshot present; dm-snapshot module missing from initramfs
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
 
-if ! ls /boot/initramfs* &>/dev/null; then
-  echo -e "${cR}This break is meant for RHEL6 and above${c0}"
-  exit 1
+# Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd
+
+REQUIRE_LVM_ROOTFS
+REQUIRE_LVM_SWAP
+
+{
+    
+cmd() {
+    ${@} || FAIL "Unable to ${@}"
+}
+
+UUID=
+if blkid ${swapdev} | grep -q UUID= && mkswap -h 2>&1 | grep -q UUID; then
+    # If swapdev has UUID, save it
+    eval $(blkid ${swapdev} | cut -d: -f2)
 fi
 
-stderr_file=$(mktemp -p ${parent})
-# Redirect stderr to temp file
-exec 7>&2 2>$stderr_file
+if swapoff ${swapdev}; then
+    # If can turn off swap: shrink swap LV by 2 extents
+    cmd lvreduce -fl -2 ${swapdev} >/dev/null
+    if [[ -n ${UUID} ]]; then
+        # If swapdev had UUID, rebuild with same
+        mkswap -U ${UUID} ${swapdev} >/dev/null
+    else
+        mkswap ${swapdev} >/dev/null
+    fi
+fi
 
-{ 
-eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name $(awk '$3=="swap" {print $1; exit}' /etc/fstab))
-swapoff /dev/${LVM2_VG_NAME}/${LVM2_LV_NAME}
-lvreduce -fL -128M ${LVM2_VG_NAME}/${LVM2_LV_NAME}
-mkswap /dev/${LVM2_VG_NAME}/${LVM2_LV_NAME}
-eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name $(findmnt -fno SOURCE /))
-lvcreate -l100%FREE -n ${LVM2_LV_NAME}s -s ${LVM2_VG_NAME}/${LVM2_LV_NAME}
-echo omit_drivers+=dm-snapshot >>/etc/dracut.conf
-mv /boot/initramfs-$(uname -r).img{,.old}
-dracut
-} >/dev/null
+# Create LV snapshot of rootdev using 1 extent
+cmd lvcreate -l1 -s ${rootdev} >/dev/null
 
-echo -e "${cB}Done. Reboot time.${c0}"
-reboot
+# Remove dm-snapshot module from initramfs or initrd
+if command -v dracut >/dev/null && [[ -f /boot/initramfs-$(uname -r).img ]]; then
+    echo omit_drivers+=dm-snapshot >>/etc/dracut.conf
+    mv /boot/initramfs-$(uname -r).img{,.old}
+    dracut
+elif command -v mkinitrd >/dev/null && [[ -f /boot/initrd-$(uname -r).img ]]; then
+    tmp=$(mktemp -d -p ${TMPDIR})
+    cd ${tmp}
+    zcat /boot/initrd-$(uname -r).img | cpio
+    find -name dm-snapshot.ko -delete
+    find . | cpio -oc | gzip -9 >/boot/initrd-$(uname -r).img
+else
+    FAIL
+fi
+
+} 2>/dev/null
+
+REBOOT

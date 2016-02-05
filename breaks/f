@@ -1,12 +1,12 @@
 #!/bin/bash
-# Missing GRUBv1 stage 2
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
 
-if [[ ! -f /boot/grub/stage2 ]]; then
-  echo -e "${cR}This break is meant for RHEL6 and below only${c0}"
-  exit 1
-fi
+# Destroy GRUBv1 stage 2 img file on bootfs
+
+REQUIRE_GRUB1
 
 shred --remove --zero /boot/grub/stage2
 
-echo -e "${cB}Done. Reboot time.${c0}"
-reboot
+REBOOT

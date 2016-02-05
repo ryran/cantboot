@@ -3,10 +3,5 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Destroy GRUBv1 stage 1 in MBR
-
-REQUIRE_GRUB1_MBR
-
-dd if=/dev/urandom of=${mbrbootdisk} bs=1 count=440
-
-REBOOT
+cd breaks
+echo * | column -t | fold -sw80 >../tokenlist

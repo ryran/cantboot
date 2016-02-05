@@ -1,7 +1,7 @@
 #!/bin/bash
-# cantboot breakboot v0.1.1 last mod 2016/02/04
+# cantboot breakboot v0.1.2 last mod 2016/02/05
 # Latest version at <https://github.com/ryran/cantboot>
-# Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com>
+# Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -12,59 +12,213 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 #    General Public License <gnu.org/licenses/gpl.html> for more details.
-#
-# In fact, this program's sole purpose is to cause boot problems.
-# Use at your own risk and preferably on a virtual machine.
 #-------------------------------------------------------------------------------
+
+# Get version from line #2
+version=$(sed '2q;d' ${0})
 
 # Colors
 c0='\033[0;0m'
 cB='\033[1;1m'
 cR='\033[1;31m'
-export c0 cB cR
+cY='\033[1;33m'
+export c0 cB cR cY
 
+gitRoot="https://raw.githubusercontent.com/ryran/cantboot/master"
+
+BOLD() { echo -e "${cB}${@}${c0}"; }
 RED() { echo -e "${cR}${@}${c0}"; }
+YELLOW() { echo -e "${cY}${@}${c0}"; }
 
 USAGE() {
-  echo -e "${cB}Usage: ${0##*/} TOKEN${c0}
-Download and launch a cantboot setup script based on TOKEN
-Please note that the sole purpose of this app is to ${cR}BREAK YOUR SYSTEM${c0} and make
-it ${cR}UNBOOTABLE${c0}. Use at your own risk, and preferably on a virtual machine."
+    echo -e "${cB}Usage: ${0##*/} { --list | [--lesson] <TOKEN> }${c0}
+Download and launch a cantboot script to break the current system
+Designed for and tested on RHEL 5, 6, and 7
+
+Options:
+  ${cB}--list${c0}           Fetch a list of available TOKENs
+  ${cB}--lesson${c0} TOKEN   Fetch details about a TOKEN
+
+${cY}Please note: the sole purpose of this app is to BREAK YOUR SYSTEM and make
+it UNBOOTABLE. Use at your own risk, preferably on a virtual machine.${c0}
+
+Version info: ${version:2}
+See <http://github.com/ryran/cantboot> to contribute"
 }
 
 if [[ ${#} -eq 0 || ${1} == -h || ${1} == --help ]]; then
-  USAGE
-  exit
-elif [[ ${#} -gt 1 ]]; then
-  RED "Invalid token"
-  USAGE
-  exit 1
+    USAGE
+    exit
 elif [[ $(id -u) != 0 ]]; then
-  RED "Must be run as root"
-  exit 1
+    RED "Must be run as root"
+    exit 1
 fi
+
+case ${1} in
+    --list)
+        curl -LsSk ${gitRoot}/tokenlist
+        exit
+        ;;
+    --lesson)
+        if ! curl -LsSk ${gitRoot}/lessons/"${2}"; then
+            RED "It looks like there's no lesson for that token"
+            exit 1
+        fi
+        exit
+        ;;
+    -*)
+        RED "Invalid option"
+        exit 1
+        ;;
+esac
+
+if [[ ${#} -gt 1 ]]; then
+    RED "Invalid number of arguments"
+    USAGE
+    exit 1
+fi
+
+FAIL() {
+    [[ -n ${1} ]] && failText=${@}
+    RED "Aborting: There was a problem setting up an essential part of this break script"
+    [[ -n ${failText} ]] && BOLD "${failText}"
+    exit 1
+}
+SORRY() {
+    [[ -n ${1} ]] && sorryText=${@}
+    YELLOW "Aborting: Sorry -- this break script ${sorryText}"
+    exit 1
+}
+
+REQUIRE_RHEL_EQUAL_TO() {
+    :
+}
+
+REQUIRE_RHEL_GREATER_THAN() {
+    :
+}
+
+REQUIRE_RHEL_LESS_THAN() {
+    :
+}
+
+REQUIRE_RHEL_VERSION_NUMBERS() {
+    :
+}
+
+REQUIRE_SELINUX_CFGFILE() {
+    sorryText="requires root-writable SELinux cfgfile /etc/selinux/config"
+    [[ -e /etc/selinux/config ]] || SORRY
+    touch /etc/selinux/config 2>/dev/null | SORRY
+}
+
+REQUIRE_GRUB1() {
+    sorryText="requires GRUB v1 system"
+    for file in /boot/grub/{grub.conf,stage1,stage2}; do
+        [[ -f ${file} ]] || SORRY
+    done
+
+}
+
+REQUIRE_GRUB1_MBR() {
+    sorryText="requires GRUB v1 system with MBR disk"
+    mbrbootdisk=$(awk '$2=="/boot" {sub(/[0-9]+$/, "", $1); print $1}' /proc/mounts)
+    [[ -b ${mbrbootdisk} ]] || SORRY
+    dd if=${mbrbootdisk} count=1 2>/dev/null |
+        file - |
+            grep -qs 'x86 boot sector; GRand Unified Bootloader, stage1' ||
+                SORRY
+}
+
+REQUIRE_GRUB2() {
+    sorryText="requires GRUB v2 system"
+    command -v grub2-install >/dev/null || SORRY
+}
+
+REQUIRE_LVM_SWAP() {
+    sorryText="requires a swap device on top of LVM"
+    for swapdev in $(awk '$3=="swap" {if ($1 !~ /^#/) print $1}' /etc/fstab); do
+        unset LVM2_VG_NAME LVM2_LV_NAME LVM2_LV_PATH
+        case ${swapdev} in
+            UUID=*)
+                eval ${swapdev}
+                swapdev=/dev/disk/by-uuid/${UUID}
+                ;;
+            LABEL=*)
+                eval ${swapdev}
+                swapdev=/dev/disk/by-label/${LABEL}
+                ;;
+            /dev/*)
+                :
+                ;;
+            *)
+                continue
+        esac
+        lvs --nameprefixes --noheadings -o lv_name ${swapdev} &>/dev/null || continue
+        eval $(lvs --nameprefixes --noheadings -o vg_name,lv_name,lv_path ${swapdev})
+        eval $(blkid ${swapdev} | cut -d: -f2)
+        return
+    done
+    SORRY
+}
+
+REQUIRE_LVM_ROOTFS() {
+    sorryText="requires rootfs on top of LVM"
+    rootdev=$(mount 2>/dev/null | awk '$3=="/" {if ($1 ~ /^\/dev/) print $1}')
+    [[ -n ${rootdev} ]] || SORRY
+    lvs ${rootdev} &>/dev/null || SORRY
+}
+
+REQUIRE_DRACUT_INITRAMFS() {
+    sorryText="requires kernel using modern initramfs files"
+    if ! command -v dracut >/dev/null || [[ ! -f /boot/initramfs-$(uname -r).img ]]; then
+        SORRY
+    fi
+}
+
+REQUIRE_MKINITRD_INITRD() {
+    sorryText="requires kernel using old-style initrd files"
+    if ! command -v mkinitrd >/dev/null || [[ ! -f /boot/initrd-$(uname -r).img ]]; then
+        SORRY
+    fi
+}
+
+REBOOT() {
+    BOLD "All done! Reboot time!"
+    if [[ ${1} == -f ]]; then
+        for sysrq in s u b; do
+            echo ${sysrq} >/proc/sysrq-trigger
+            sleep 5
+        done
+    else
+        reboot
+    fi
+}
 
 # Create sub tempdir in /dev/shm (tons of bash constructs use TMPDIR)
 [[ -d /dev/shm && -w /dev/shm ]] && parent=/dev/shm || parent=/tmp
 export parent TMPDIR=$(mktemp -d -p ${parent})
+
 # Remove temp dir when we're done
-trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT
+trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
+
+# Ensure anything we create goes to TMPDIR
 cd ${TMPDIR}
 
-echo "Inspecting TOKEN and attempting download ..."
-if curl -Lsko breakscript https://raw.githubusercontent.com/ryran/cantboot/master/breaks/"${1}"; then
-  if file breakscript | grep -qs 'Bourne-Again shell script'; then
-    echo "Break script payload downloaded intact; executing ..."
-    bash breakscript
-  else
-    RED "Problem downloading break script; received file not as expected"
-    read -ep "Press Ctrl-c to quit or Enter to see received file "
-    less -S breakscript
-    exit 1
-  fi
+BOLD "Inspecting TOKEN and attempting download ..."
+
+if curl -LsSko breakscript ${gitRoot}/breaks/"${1}"; then
+    if file breakscript | grep -qs 'Bourne-Again shell script'; then
+        BOLD "Break script payload downloaded intact; executing ..."
+        source breakscript
+    else
+        RED "Problem downloading break script; received file not as expected"
+        read -ep "Press Ctrl-c to quit or Enter to see received file "
+        less -S breakscript
+        exit 1
+    fi
 else
-  RED "Problem downloading break script; curl command failed"
-  echo "Are you sure you input a valid TOKEN?"
-  exit 1
+    RED "Problem downloading break script; curl command failed"
+    echo -e "Try executing ${cB}${0##*/} --list${c0}"
+    exit 1
 fi
-    

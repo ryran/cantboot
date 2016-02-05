@@ -1,9 +1,15 @@
 #!/bin/bash
-# Typo in selinux/config; missing policy
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Put typo in selinux/config to cause missing policy kernel panic
  
+REQUIRE_SELINUX_CFGFILE
+
 cat >/etc/selinux/config <<EOF
 SELINUX=enforcing
 SELINUXTYPE=permissive
 EOF
-echo -e "${cB}Done. Reboot time.${c0}"
-reboot
+
+REBOOT

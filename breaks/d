@@ -1,8 +1,27 @@
 #!/bin/bash
-# Missing GRUB config files (but backups present)
- 
-for f in /boot/grub/grub.conf /boot/grub2/grub.cfg; do
-  mv $f $f.old 2>/dev/null
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Rename GRUB v1 or v2 config files
+
+possible_grub_cfgfile_locations="
+    /boot/grub/grub.conf
+    /boot/efi/EFI/redhat/grub.conf
+    /boot/grub2/grub.cfg
+    /boot/efi/EFI/redhat/grub.cfg
+    /boot/grub/grub.cfg
+"
+
+nothing_renamed=True
+
+for file in ${possible_grub_cfgfile_locations}; do
+    mv ${file} ${file}.old 2>/dev/null && nothing_renamed=False
 done
-echo -e "${cB}Done. Reboot time.${c0}"
-reboot
+
+if [[ ${nothing_renamed} == True ]]; then
+    sorryText="requires some version of GRUB but couldn't find any GRUB configs in /boot"
+    SORRY
+fi
+
+REBOOT
