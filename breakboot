@@ -1,5 +1,5 @@
 #!/bin/bash
-# cantboot breakboot v0.1.2 last mod 2016/02/05
+# cantboot breakboot v0.1.3 last mod 2016/02/05
 # Latest version at <https://github.com/ryran/cantboot>
 # Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 #
@@ -14,7 +14,7 @@
 #    General Public License <gnu.org/licenses/gpl.html> for more details.
 #-------------------------------------------------------------------------------
 
-[[ ${1} == --silentcheck ]] && exit || exit 30
+[[ ${1} == --silentcheck ]] && exit
 
 # Get version from line #2
 version=$(sed '2q;d' ${0})
