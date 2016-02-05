@@ -149,6 +149,14 @@ REQUIRE_SELINUX_CFGFILE() {
     touch /etc/selinux/config 2>/dev/null || SORRY
 }
 
+possible_grub_cfgfile_locations="
+    /boot/grub/grub.conf
+    /boot/efi/EFI/redhat/grub.conf
+    /boot/grub2/grub.cfg
+    /boot/efi/EFI/redhat/grub.cfg
+    /boot/grub/grub.cfg
+"
+
 REQUIRE_GRUB1() {
     sorryText="requires GRUB v1 system"
     for file in /boot/grub/{grub.conf,stage1,stage2}; do
