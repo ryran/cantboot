@@ -169,6 +169,8 @@ REQUIRE_LVM_ROOTFS() {
     rootdev=$(mount 2>/dev/null | awk '$3=="/" {if ($1 ~ /^\/dev/) print $1}')
     [[ -n ${rootdev} ]] || SORRY
     lvs ${rootdev} &>/dev/null || SORRY
+    [[ ${rootdev::11} == /dev/mapper ]] && 
+        rootdev=$(lvs --noheadings -o lv_path ${rootdev} | tr -d ' ')
 }
 
 REQUIRE_DRACUT_INITRAMFS() {
