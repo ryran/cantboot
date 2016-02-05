@@ -14,4 +14,4 @@ sed -i "s,${LVM2_VG_NAME}.${LVM2_LV_NAME},&11," /etc/fstab
 [[ -n ${UUID} ]] && sed -i "s,${UUID},${UUID::30}1d9a," /etc/fstab
 [[ -n ${LABEL} ]] && sed -i "s,LABEL=${LABEL},LABEL=${LABEL}1," /etc/fstab
 
-#REBOOT
+REBOOT

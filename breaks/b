@@ -11,7 +11,7 @@ REQUIRE_LVM_SWAP
 {
     
 cmd() {
-    ${@} || FAIL "Unable to ${@}"
+    ${@} >/dev/null || FAIL "Unable to ${@}"
 }
 
 UUID=
@@ -22,7 +22,7 @@ fi
 
 if swapoff ${swapdev}; then
     # If can turn off swap: shrink swap LV by 2 extents
-    cmd lvreduce -fl -2 ${swapdev} >/dev/null
+    cmd lvreduce -fl -2 ${swapdev}
     if [[ -n ${UUID} ]]; then
         # If swapdev had UUID, rebuild with same
         mkswap -U ${UUID} ${swapdev} >/dev/null
@@ -32,7 +32,7 @@ if swapoff ${swapdev}; then
 fi
 
 # Create LV snapshot of rootdev using 1 extent
-cmd lvcreate -l1 -s ${rootdev} >/dev/null
+cmd lvcreate -l1 -s ${rootdev}
 
 # Remove dm-snapshot module from initramfs or initrd
 if command -v dracut >/dev/null && [[ -f /boot/initramfs-$(uname -r).img ]]; then
@@ -46,7 +46,7 @@ elif command -v mkinitrd >/dev/null && [[ -f /boot/initrd-$(uname -r).img ]]; th
     find -name dm-snapshot.ko -delete
     find . | cpio -oc | gzip -9 >/boot/initrd-$(uname -r).img
 else
-    FAIL
+    FAIL "Unable to find mkinitrd/dracut and/or current initrd/initramfs file"
 fi
 
 } 2>/dev/null
