@@ -17,18 +17,24 @@
 # Get version from line #2
 version=$(sed '2q;d' ${0})
 
+gitRoot="https://raw.githubusercontent.com/ryran/cantboot/master"
+
 # Colors
 c0='\033[0;0m'
 cB='\033[1;1m'
 cR='\033[1;31m'
 cY='\033[1;33m'
-export c0 cB cR cY
-
-gitRoot="https://raw.githubusercontent.com/ryran/cantboot/master"
-
+cG='\033[1;32m'
+cg='\033[0;32m'
+cC='\033[1;36m'
+cc='\033[0;36m'
 BOLD() { echo -e "${cB}${@}${c0}"; }
 RED() { echo -e "${cR}${@}${c0}"; }
 YELLOW() { echo -e "${cY}${@}${c0}"; }
+GREEN() { echo -e "${cG}${@}${c0}"; }
+green() { echo -e "${cg}${@}${c0}"; }
+CYAN() { echo -e "${cC}${@}${c0}"; }
+cyan() { echo -e "${cc}${@}${c0}"; }
 
 USAGE() {
     echo -e "${cB}Usage: ${0##*/} { --list | [--lesson] <TOKEN> }${c0}
@@ -86,6 +92,7 @@ FAIL() {
     [[ -n ${failText} ]] && BOLD "${failText}"
     exit 1
 }
+
 SORRY() {
     [[ -n ${1} ]] && sorryText=${@}
     YELLOW "Aborting: Sorry -- this break script ${sorryText}"
@@ -188,7 +195,7 @@ REQUIRE_MKINITRD_INITRD() {
 }
 
 REBOOT() {
-    BOLD "All done! Reboot time!"
+    GREEN "All done! Reboot time!"
     if [[ ${1} == -f ]]; then
         for sysrq in s u b; do
             echo ${sysrq} >/proc/sysrq-trigger
@@ -209,11 +216,11 @@ trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
 # Ensure anything we create goes to TMPDIR
 cd ${TMPDIR}
 
-BOLD "Inspecting TOKEN and attempting download ..."
+cyan "Inspecting TOKEN and attempting download ..."
 
 if curl -LsSko breakscript ${gitRoot}/breaks/"${1}"; then
     if file breakscript | grep -qs 'Bourne-Again shell script'; then
-        BOLD "Break script payload downloaded intact; executing ..."
+        green "Break script payload downloaded intact; executing ..."
         source breakscript
     else
         RED "Problem downloading break script; received file not as expected"
