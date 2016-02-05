@@ -129,13 +129,13 @@ REQUIRE_GRUB1() {
 
 }
 
-REQUIRE_GRUB1_MBR() {
-    sorryText="requires GRUB v1 system with MBR disk"
+REQUIRE_GRUB_MBR() {
+    sorryText="requires GRUB v1 or v2 embedded in system MBR"
     mbrbootdisk=$(awk '$2=="/boot" {sub(/[0-9]+$/, "", $1); print $1}' /proc/mounts)
     [[ -b ${mbrbootdisk} ]] || SORRY
     dd if=${mbrbootdisk} count=1 2>/dev/null |
-        file - |
-            grep -qs 'x86 boot sector; GRand Unified Bootloader, stage1' ||
+        strings |
+            grep -qs 'GRUB.*Geom.*Hard.*Disk.*Read.*Error' ||
                 SORRY
 }
 
