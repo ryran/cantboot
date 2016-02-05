@@ -230,11 +230,12 @@ REQUIRE_MKINITRD_INITRD() {
 }
 
 REBOOT() {
-    GREEN "All done! Reboot time!"
+    echo "All done Reboot time"
     if [[ ${1} == -f ]]; then
-        for sysrq in s u b; do
+        ${TMPDIR}/sync
+        for sysrq in u b; do
             echo ${sysrq} >/proc/sysrq-trigger
-            sleep 5
+            ${TMPDIR}/sleep 5
         done
     else
         reboot
@@ -250,6 +251,7 @@ trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
 
 # Ensure anything we create goes to TMPDIR
 cd ${TMPDIR}
+cp -a /bin/{sleep,sync} .
 
 if [[ ${do_update} == True ]]; then
     UPDATE
