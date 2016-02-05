@@ -118,7 +118,7 @@ REQUIRE_RHEL_VERSION_NUMBERS() {
 REQUIRE_SELINUX_CFGFILE() {
     sorryText="requires root-writable SELinux cfgfile /etc/selinux/config"
     [[ -e /etc/selinux/config ]] || SORRY
-    touch /etc/selinux/config 2>/dev/null | SORRY
+    touch /etc/selinux/config 2>/dev/null || SORRY
 }
 
 REQUIRE_GRUB1() {
