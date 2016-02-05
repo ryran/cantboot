@@ -3,10 +3,16 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Restrict LVM filters
+# Remove initrd line from GRUB config file
 
-REQUIRE_LVM_ROOTFS
+possible_grub_cfgfile_locations="
+    /boot/grub/grub.conf
+    /boot/efi/EFI/redhat/grub.conf
+    /boot/grub2/grub.cfg
+    /boot/efi/EFI/redhat/grub.cfg
+    /boot/grub/grub.cfg
+"
 
-
+sed -i '/^\s*initrd/d' ${possible_grub_cfgfile_locations} &>/dev/null
 
 REBOOT
