@@ -7,6 +7,6 @@
 
 REQUIRE_GRUB1_MBR
 
-dd if=/dev/urandom of=${mbrbootdisk} bs=1 count=440
+dd if=/dev/urandom of=${mbrbootdisk} bs=1 count=440 &>/dev/null
 
 REBOOT
