@@ -133,10 +133,9 @@ REQUIRE_GRUB_MBR() {
     sorryText="requires GRUB v1 or v2 embedded in system MBR"
     mbrbootdisk=$(awk '$2=="/boot" {sub(/[0-9]+$/, "", $1); print $1}' /proc/mounts)
     [[ -b ${mbrbootdisk} ]] || SORRY
-    dd if=${mbrbootdisk} count=1 2>/dev/null |
-        strings |
-            grep -qs 'GRUB.*Geom.*Hard.*Disk.*Read.*Error' ||
-                SORRY
+    echo $(dd if=${mbrbootdisk} count=1 2>/dev/null | strings) |
+        grep -qs 'GRUB.*Geom.*Hard.*Disk.*Read.*Error' ||
+            SORRY
 }
 
 REQUIRE_GRUB2() {
