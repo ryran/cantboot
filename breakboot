@@ -14,6 +14,8 @@
 #    General Public License <gnu.org/licenses/gpl.html> for more details.
 #-------------------------------------------------------------------------------
 
+[[ ${1} == --silentcheck ]] && exit || exit 30
+
 # Get version from line #2
 version=$(sed '2q;d' ${0})
 
@@ -37,13 +39,14 @@ CYAN() { echo -e "${cC}${@}${c0}"; }
 cyan() { echo -e "${cc}${@}${c0}"; }
 
 USAGE() {
-    echo -e "${cB}Usage: ${0##*/} { --list | [--lesson] <TOKEN> }${c0}
+    echo -e "${cB}Usage: ${0##*/} { --list | [--lesson] <TOKEN> | --update }${c0}
 Download and launch a cantboot script to break the current system
 Designed for and tested on RHEL 5, 6, and 7
 
 Options:
   ${cB}--list${c0}           Fetch a list of available TOKENs
   ${cB}--lesson${c0} TOKEN   Fetch details about a TOKEN
+  ${cB}--update${c0}         Update this launcher script
 
 ${cY}Please note: the sole purpose of this app is to BREAK YOUR SYSTEM and make
 it UNBOOTABLE. Use at your own risk, preferably on a virtual machine.${c0}
@@ -75,6 +78,9 @@ case ${1} in
             exit 1
         fi
         ;;
+    --update)
+        do_update=True
+        ;;
     -*)
         RED "Invalid option"
         exit 1
@@ -89,6 +95,24 @@ elif [[ $(id -u) != 0 ]]; then
     RED "Must be run as root"
     exit 1
 fi
+
+UPDATE() {
+    cyan "Downloading ${gitRoot}/breakboot ..."
+    if curl -OLsSk ${gitRoot}/breakboot; then
+        chmod +x breakboot
+        if ! ./breakboot --silentcheck; then
+            RED "Download failed; unable to update"
+            exit 1
+        fi
+        mv breakboot "${0}"
+        GREEN "Updated "${0}" successfully"
+        echo "Execute again"
+        exit
+    else
+        RED "Download failed; unable to update"
+        exit 1
+    fi
+}
 
 FAIL() {
     [[ -n ${1} ]] && failText=${@}
@@ -218,6 +242,10 @@ trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
 
 # Ensure anything we create goes to TMPDIR
 cd ${TMPDIR}
+
+if [[ ${do_update} == True ]]; then
+    UPDATE
+fi
 
 cyan "Inspecting TOKEN and attempting download ..."
 
