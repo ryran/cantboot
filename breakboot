@@ -52,15 +52,16 @@ Version info: ${version:2}
 See <http://github.com/ryran/cantboot> to contribute"
 }
 
-if [[ ${#} -eq 0 || ${1} == -h || ${1} == --help ]]; then
+if [[ ${#} -eq 0 ]]; then
     USAGE
     exit
-elif [[ $(id -u) != 0 ]]; then
-    RED "Must be run as root"
-    exit 1
 fi
 
 case ${1} in
+    -h|--help)
+        USAGE
+        exit
+        ;;
     --list)
         curl -LsSk ${gitRoot}/tokenlist
         exit
@@ -83,6 +84,9 @@ esac
 if [[ ${#} -gt 1 ]]; then
     RED "Invalid number of arguments"
     USAGE
+    exit 1
+elif [[ $(id -u) != 0 ]]; then
+    RED "Must be run as root"
     exit 1
 fi
 
