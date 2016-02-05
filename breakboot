@@ -60,11 +60,13 @@ case ${1} in
         exit
         ;;
     --lesson)
-        if ! curl -LsSk ${gitRoot}/lessons/"${2}"; then
-            RED "It looks like there's no lesson for that token"
+        if curl -LsSk ${gitRoot}/lessons/"${2}"; then
+            echo
+            exit
+        else
+            RED "Problem connecting to github (no internet?)"
             exit 1
         fi
-        exit
         ;;
     -*)
         RED "Invalid option"
