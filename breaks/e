@@ -5,6 +5,7 @@
 
 # Destroy GRUB stage 1 in MBR
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_GRUB_MBR
 
 dd if=/dev/urandom of=${mbrbootdisk} bs=1 count=440 &>/dev/null

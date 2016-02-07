@@ -6,6 +6,7 @@
 # Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd
 # Since we can't count on free extents in VG, reduce swap LV to make space
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_ROOTFS
 REQUIRE_LVM_SWAP
 

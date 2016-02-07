@@ -4,7 +4,8 @@
 # License: GPL v3
 
 # Put typo in selinux/config to cause missing policy kernel panic
- 
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_SELINUX_CFGFILE
 
 cat >/etc/selinux/config <<EOF

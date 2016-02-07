@@ -5,6 +5,7 @@
 
 # Destroy GRUBv1 stage 2 img file on bootfs
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_GRUB1
 
 shred --remove --zero /boot/grub/stage2

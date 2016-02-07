@@ -5,6 +5,7 @@
 
 # Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs 
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_ROOTFS
 
 sed -i 's,^\s*filter.*,#&,' /etc/lvm/lvm.conf

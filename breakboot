@@ -14,7 +14,7 @@
 #    General Public License <gnu.org/licenses/gpl.html> for more details.
 #-------------------------------------------------------------------------------
 
-[[ ${1} == --silentcheck ]] && exit
+[[ ${1} == --silentcheck ]] && exit 77
 
 # Get version from line #2
 version=$(sed '2q;d' ${0})
@@ -39,14 +39,14 @@ CYAN() { echo -e "${cC}${@}${c0}"; }
 cyan() { echo -e "${cc}${@}${c0}"; }
 
 USAGE() {
-    echo -e "${cB}Usage: ${0##*/} { --list | [--lesson] <TOKEN> | --update }${c0}
+    echo -e "${cB}Usage: ${0##*/} { --list | [--info] <TOKEN> | --update }${c0}
 Download and launch a cantboot script to break the current system
 Designed for and tested on RHEL 5, 6, and 7
 
 Options:
-  ${cB}--list${c0}           Fetch a list of available TOKENs
-  ${cB}--lesson${c0} TOKEN   Fetch details about a TOKEN
-  ${cB}--update${c0}         Update this launcher script
+  ${cB}--list${c0}         Fetch a list of available TOKENs
+  ${cB}--info${c0} TOKEN   Fetch details about a TOKEN
+  ${cB}--update${c0}       Update this launcher script
 
 ${cY}Please note: the sole purpose of this app is to BREAK YOUR SYSTEM and make
 it UNBOOTABLE. Use at your own risk, preferably on a virtual machine.${c0}
@@ -69,8 +69,8 @@ case ${1} in
         curl -LsSk ${gitRoot}/tokenlist
         exit
         ;;
-    --lesson)
-        if curl -LsSk ${gitRoot}/lessons/"${2}"; then
+    --info)
+        if curl -LsSk ${gitRoot}/infos/"${2}"; then
             echo
             exit
         else
@@ -96,11 +96,25 @@ elif [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
+FAIL() {
+    [[ -n ${1} ]] && failText=${@}
+    RED "Aborting: There was a problem setting up an essential part of this break script"
+    [[ -n ${failText} ]] && BOLD "${failText}"
+    exit 1
+}
+
+SORRY() {
+    [[ -n ${1} ]] && sorryText=${@}
+    YELLOW "Aborting: Sorry -- this break script ${sorryText}"
+    exit 1
+}
+
 UPDATE() {
     cyan "Downloading ${gitRoot}/breakboot ..."
     if curl -OLsSk ${gitRoot}/breakboot; then
         chmod +x breakboot
-        if ! ./breakboot --silentcheck; then
+        ./breakboot --silentcheck &>/dev/null
+        if [[ ${?} != 77 ]]; then
             RED "Download failed; unable to update"
             exit 1
         fi
@@ -114,17 +128,18 @@ UPDATE() {
     fi
 }
 
-FAIL() {
-    [[ -n ${1} ]] && failText=${@}
-    RED "Aborting: There was a problem setting up an essential part of this break script"
-    [[ -n ${failText} ]] && BOLD "${failText}"
-    exit 1
-}
+# We should increment this any time we add new functions
+cantbootVersionMagic=1
 
-SORRY() {
-    [[ -n ${1} ]] && sorryText=${@}
-    YELLOW "Aborting: Sorry -- this break script ${sorryText}"
-    exit 1
+REQUIRE_CANTBOOT_VERSION_MAGIC() {
+    if [[ ${1} -gt ${cantbootVersionMagic} ]]; then
+        YELLOW "Sorry -- this break script requires a newer cantboot breakboot version"
+        printf "${cB}Update now? [y]/n${c0} "
+        read -ep
+        if [[ ${REPLY} != n ]]; then
+            UPDATE
+        fi
+    fi
 }
 
 REQUIRE_RHEL_EQUAL_TO() {

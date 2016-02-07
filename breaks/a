@@ -5,6 +5,7 @@
 
 # Rename a swap LV and change fstab to a different name (but don't fix kernel cmdline)
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_SWAP
 
 swapoff ${swapdev}

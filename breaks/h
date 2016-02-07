@@ -5,6 +5,8 @@
 
 # Remove initrd line from GRUB config file
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
+
 sed -i '/^\s*initrd/d' ${possible_grub_cfgfile_locations} &>/dev/null
 
 REBOOT

@@ -5,6 +5,8 @@
 
 # Rename GRUB v1 or v2 config files
 
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
+
 nothing_renamed=True
 
 for file in ${possible_grub_cfgfile_locations}; do
