@@ -3,7 +3,21 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Restrict LVM filters
+# Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs 
 
 REQUIRE_LVM_ROOTFS
 
+sed -i 's,^\s*filter.*,#&,' /etc/lvm/lvm.conf
+sed -i 's,^\s*devices.*,&\n    filter = [ "r/[vhs]d/" ],' /etc/lvm/lvm.conf
+
+if command -v dracut >/dev/null && [[ -f /boot/initramfs-$(uname -r).img ]]; then
+    rm /boot/initramfs-$(uname -r).img
+    dracut &>/dev/null
+    chattr +i /boot/initramfs-$(uname -r).img
+elif command -v mkinitrd >/dev/null && [[ -f /boot/initrd-$(uname -r).img ]]; then
+    rm /boot/initrd-$(uname -r).img
+    mkinitrd /boot/initrd-$(uname -r).img $(uname -r) &>/dev/null
+    chattr +i /boot/initrd-$(uname -r).img
+fi
+
+REBOOT

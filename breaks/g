@@ -5,16 +5,6 @@
 
 # Remove execute bit from all the things
 
-## FIXME: Remove after today
-cp -a /bin/{sleep,sync} ${TMPDIR}
-
 chmod -R -x /bin /sbin
 
-## FIXME: Remove after today
-${TMPDIR}/sync
-for sysrq in u b; do
-    echo ${sysrq} >/proc/sysrq-trigger
-    ${TMPDIR}/sleep 5
-done
-
-##REBOOT -f
+REBOOT -f

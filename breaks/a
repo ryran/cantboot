@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Rname a swap LV
+# Rename a swap LV and change fstab to a different name (but don't fix kernel cmdline)
 
 REQUIRE_LVM_SWAP
 
