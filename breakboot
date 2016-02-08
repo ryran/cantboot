@@ -1,5 +1,5 @@
 #!/bin/bash
-# cantboot breakboot v0.1.3 last mod 2016/02/06
+# cantboot breakboot v0.1.4 last mod 2016/02/08
 # Latest version at <https://github.com/ryran/cantboot>
 # Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 #
@@ -159,11 +159,13 @@ REQUIRE_RHEL_VERSION_NUMBERS() {
 }
 
 REQUIRE_SELINUX_CFGFILE() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires root-writable SELinux cfgfile /etc/selinux/config"
     [[ -e /etc/selinux/config ]] || SORRY
     touch /etc/selinux/config 2>/dev/null || SORRY
 }
 
+# CANTBOOT_VERSION_MAGIC 1
 possible_grub_cfgfile_locations="
     /boot/grub/grub.conf
     /boot/efi/EFI/redhat/grub.conf
@@ -173,6 +175,7 @@ possible_grub_cfgfile_locations="
 "
 
 REQUIRE_GRUB1() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires GRUB v1 system"
     for file in /boot/grub/{grub.conf,stage1,stage2}; do
         [[ -f ${file} ]] || SORRY
@@ -181,6 +184,7 @@ REQUIRE_GRUB1() {
 }
 
 REQUIRE_GRUB_MBR() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires GRUB v1 or v2 embedded in system MBR"
     mbrbootdisk=$(awk '$2=="/boot" {sub(/[0-9]+$/, "", $1); print $1}' /proc/mounts)
     [[ -b ${mbrbootdisk} ]] || SORRY
@@ -190,11 +194,13 @@ REQUIRE_GRUB_MBR() {
 }
 
 REQUIRE_GRUB2() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires GRUB v2 system"
     command -v grub2-install >/dev/null || SORRY
 }
 
 REQUIRE_LVM_SWAP() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires a swap device on top of LVM"
     for swapdev in $(awk '$3=="swap" {if ($1 !~ /^#/) print $1}' /etc/fstab); do
         unset LVM2_VG_NAME LVM2_LV_NAME LVM2_LV_PATH
@@ -222,6 +228,7 @@ REQUIRE_LVM_SWAP() {
 }
 
 REQUIRE_LVM_ROOTFS() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires rootfs on top of LVM"
     rootdev=$(mount 2>/dev/null | awk '$3=="/" {if ($1 ~ /^\/dev/) print $1}')
     [[ -n ${rootdev} ]] || SORRY
@@ -231,6 +238,7 @@ REQUIRE_LVM_ROOTFS() {
 }
 
 REQUIRE_DRACUT_INITRAMFS() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires kernel using modern initramfs files"
     if ! command -v dracut >/dev/null || [[ ! -f /boot/initramfs-$(uname -r).img ]]; then
         SORRY
@@ -238,6 +246,7 @@ REQUIRE_DRACUT_INITRAMFS() {
 }
 
 REQUIRE_MKINITRD_INITRD() {
+    # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires kernel using old-style initrd files"
     if ! command -v mkinitrd >/dev/null || [[ ! -f /boot/initrd-$(uname -r).img ]]; then
         SORRY
@@ -245,6 +254,7 @@ REQUIRE_MKINITRD_INITRD() {
 }
 
 REBOOT() {
+    # CANTBOOT_VERSION_MAGIC 1
     echo "All done Reboot time"
     if [[ ${1} == -f ]]; then
         ${TMPDIR}/sync
