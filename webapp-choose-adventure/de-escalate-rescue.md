@@ -24,5 +24,5 @@ Steps:
   - `service httpd start`
 
 1. Result:
-  - [The customer was able to access needed production services from another machine!](congrats.html)
-  - [Things didn't go smoothly and this wasn't good enough!](de-escalate-rescue2.html)
+  - [The customer was able to access needed production services from another machine!](congrats.md)
+  - [Things didn't go smoothly and this wasn't good enough!](de-escalate-rescue2.md)

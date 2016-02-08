@@ -14,4 +14,4 @@
 1. Take screenshot of console or if that's not possible, take photo with a camera
 1. Ask if they have console logging configured (serial, iDRAC, iLO, etc)
   - If so, get logs from most recent attempt with `debug`
-1. [De-escalate + capture more data](de-escalate.html)
+1. [De-escalate + capture more data](de-escalate.md)
