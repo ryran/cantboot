@@ -6,7 +6,10 @@
 cd breaks
 echo * | fold -sw60 | column -t >../tokens-ls
 for f in *; do
-    grep -q '^# Description:' "${f}" &&
-        printf "▪ "
-        grep -H '^# Description:' "${f}" | cut -d: -f1,3-
+    printf "▪ ${f} :"
+    if grep -q '^# Description:' "${f}"; then
+        grep '^# Description:' "${f}" | cut -d: -f2-
+    else
+        echo
+    fi
 done >../tokens-ll

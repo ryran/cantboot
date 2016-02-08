@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs 
+# Description: Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_ROOTFS
