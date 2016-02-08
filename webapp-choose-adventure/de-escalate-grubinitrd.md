@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html>
-<title>Can't-boot First-Responders: De-escalate - GRUBMAGIC</title>
-<xmp theme="united" style="display:none;">
+# Can't-boot First-Responders: De-escalate - GRUBMAGIC
 
 ### De-escalation work-around #1: Try to GRUB your way out of it
 
@@ -16,7 +13,3 @@
   - [One of the alternate initrd/initramfs files booted!](congrats.html)
 
   - [None of the alternates booted or there is only 1 initrd/initramfs file!](de-escalate-rescue.html)
-
-</xmp>
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
-</html>

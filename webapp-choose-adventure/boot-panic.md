@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html>
-<title>Can't-boot First-Responders: Booting to kernel panic</title>
-<xmp theme="united" style="display:none;">
+# Can't-boot First-Responders: Booting to kernel panic
 
 ### System boots to kernel panic
 1. Have customer start downloading the latest DVD iso (but the same major version) from https://access.redhat.com/downloads in case rescue mode ends up being required
@@ -18,7 +15,3 @@
 1. Ask if they have console logging configured (serial, iDRAC, iLO, etc)
   - If so, get logs from most recent attempt with `debug`
 1. [De-escalate + capture more data](de-escalate.html)
-
-</xmp>
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
-</html>

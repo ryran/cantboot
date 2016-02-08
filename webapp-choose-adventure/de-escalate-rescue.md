@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html>
-<title>Can't-boot First-Responders: De-escalate - Rescue mode</title>
-<xmp theme="united" style="display:none;">
+# Can't-boot First-Responders: De-escalate - Rescue mode
 
 ### De-escalation work-around #2 - Use rescue mode to bring up system
 
@@ -29,7 +26,3 @@ Steps:
 1. Result:
   - [The customer was able to access needed production services from another machine!](congrats.html)
   - [Things didn't go smoothly and this wasn't good enough!](de-escalate-rescue2.html)
-
-</xmp>
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
-</html>
