@@ -1,0 +1,8 @@
+▪ a: Rename a swap LV and change fstab reference (UUID, LABEL, or path) to an altogether different name but don't fix kernel cmdline.
+▪ b: Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
+▪ c: Put typo in selinux/config to cause missing policy kernel panic.
+▪ d: Rename GRUB v1 or v2 config files to <FILE>.old allowing for quick recovery.
+▪ e: Destroy GRUBv1 or GRUBv2 stage 1 in MBR.
+▪ f: Destroy GRUBv1 stage 2 img file in /boot/grub.
+▪ g: Remove execute bit from all the things.
+▪ h: Remove initrd line from GRUBv1 and GRUBv2 config files.

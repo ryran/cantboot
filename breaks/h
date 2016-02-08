@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Remove initrd line from GRUB config file
+# Description: Remove initrd line from GRUBv1 and GRUBv2 config files.
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 

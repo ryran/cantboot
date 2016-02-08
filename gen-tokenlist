@@ -4,4 +4,9 @@
 # License: GPL v3
 
 cd breaks
-echo * | column -t | fold -sw80 >../tokenlist
+echo * | fold -sw60 | column -t >../token-ls
+for f in *; do
+    grep -q '^# Description:' "${f}" &&
+        printf "▪ "
+        grep -H '^# Description:' "${f}" | cut -d: -f1,3-
+done >../token-ll

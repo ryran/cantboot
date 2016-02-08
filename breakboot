@@ -16,6 +16,8 @@
 
 [[ ${1} == --silentcheck ]] && exit 77
 
+sysargv=( "${@}" )
+
 # Get version from line #2
 version=$(sed '2q;d' ${0})
 
@@ -38,15 +40,44 @@ green() { echo -e "${cg}${@}${c0}"; }
 CYAN() { echo -e "${cC}${@}${c0}"; }
 cyan() { echo -e "${cc}${@}${c0}"; }
 
+UPDATE() {
+    cyan "Downloading ${gitRoot}/breakboot ..."
+    if curl -o ./breakboot.tmp -LsSk ${gitRoot}/breakboot; then
+        chmod +x ./breakboot.tmp
+        ./breakboot.tmp --silentcheck &>/dev/null
+        if [[ ${?} != 77 ]]; then
+            RED "Download failed; unable to update"
+            exit 1
+        fi
+        if mv -v ./breakboot.tmp "${0}"; then
+            GREEN "Updated "${0}" successfully"
+        else
+            RED "Error moving downloaded file ('${PWD}/breakboot.tmp') to original script location ('${0}')"
+            exit 1
+        fi
+        if [[ ${sysargv[0]} == --update ]]; then
+            echo "Exiting"
+            exit
+        else
+            echo "Re-executing with same args ..."
+            exec "${0}" "${sysargv[@]}"
+        fi
+    else
+        RED "Download failed; unable to update"
+        exit 1
+    fi
+}
+
 USAGE() {
-    echo -e "${cB}Usage: ${0##*/} { --list | [--info] <TOKEN> | --update }${c0}
+    echo -e "${cB}Usage: ${0##*/} { --ls | --ll | [--info] <TOKEN> | --update }${c0}
 Download and launch a cantboot script to break the current system
 Designed for and tested on RHEL 5, 6, and 7
 
 Options:
-  ${cB}--list${c0}         Fetch a list of available TOKENs
-  ${cB}--info${c0} TOKEN   Fetch details about a TOKEN
-  ${cB}--update${c0}       Update this launcher script
+  ${cB}--ls${c0}             Fetch a list of available TOKENs
+  ${cB}--ll${c0}             Fetch a list of available TOKENs + descriptions
+  ${cB}--lesson${c0} TOKEN   Fetch details about a TOKEN
+  ${cB}--update${c0}         Update this launcher script
 
 ${cY}Please note: the sole purpose of this app is to BREAK YOUR SYSTEM and make
 it UNBOOTABLE. Use at your own risk, preferably on a virtual machine.${c0}
@@ -55,22 +86,28 @@ Version info: ${version:2}
 See <http://github.com/ryran/cantboot> to contribute"
 }
 
+# If no args ...
 if [[ ${#} -eq 0 ]]; then
     USAGE
     exit
 fi
 
+# Case through all args
 case ${1} in
     -h|--help)
         USAGE
         exit
         ;;
-    --list)
-        curl -LsSk ${gitRoot}/tokenlist
+    --ls)
+        curl -LsSk ${gitRoot}/tokens-ls
         exit
         ;;
-    --info)
-        if curl -LsSk ${gitRoot}/infos/"${2}"; then
+    --ll)
+        curl -LsSk ${gitRoot}/tokens-ll
+        exit
+        ;;
+    --lesson)
+        if curl -LsSk ${gitRoot}/lessons/"${2}"; then
             echo
             exit
         else
@@ -87,6 +124,7 @@ case ${1} in
         ;;
 esac
 
+# Check a few things
 if [[ ${#} -gt 1 ]]; then
     RED "Invalid number of arguments"
     USAGE
@@ -95,6 +133,26 @@ elif [[ $(id -u) != 0 ]]; then
     RED "Must be run as root"
     exit 1
 fi
+
+# Create sub tempdir in /dev/shm (tons of bash constructs use TMPDIR)
+[[ -d /dev/shm && -w /dev/shm ]] && parent=/dev/shm || parent=/tmp
+export parent TMPDIR=$(mktemp -d -p ${parent})
+
+# Remove temp dir when we're done
+trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
+
+# Ensure anything we create goes to TMPDIR
+cd ${TMPDIR}
+
+if [[ ${do_update} == True ]]; then
+    UPDATE
+fi
+
+# These might be needed for REBOOT -f
+cp -a /bin/{sleep,sync} .
+
+# We should increment this any time we add new functions
+cantbootVersionMagic=1
 
 FAIL() {
     [[ -n ${1} ]] && failText=${@}
@@ -108,28 +166,6 @@ SORRY() {
     YELLOW "Aborting: Sorry -- this break script ${sorryText}"
     exit 1
 }
-
-UPDATE() {
-    cyan "Downloading ${gitRoot}/breakboot ..."
-    if curl -OLsSk ${gitRoot}/breakboot; then
-        chmod +x breakboot
-        ./breakboot --silentcheck &>/dev/null
-        if [[ ${?} != 77 ]]; then
-            RED "Download failed; unable to update"
-            exit 1
-        fi
-        mv breakboot "${0}"
-        GREEN "Updated "${0}" successfully"
-        echo "Execute again"
-        exit
-    else
-        RED "Download failed; unable to update"
-        exit 1
-    fi
-}
-
-# We should increment this any time we add new functions
-cantbootVersionMagic=1
 
 REQUIRE_CANTBOOT_VERSION_MAGIC() {
     if [[ ${1} -gt ${cantbootVersionMagic} ]]; then
@@ -266,21 +302,6 @@ REBOOT() {
         reboot
     fi
 }
-
-# Create sub tempdir in /dev/shm (tons of bash constructs use TMPDIR)
-[[ -d /dev/shm && -w /dev/shm ]] && parent=/dev/shm || parent=/tmp
-export parent TMPDIR=$(mktemp -d -p ${parent})
-
-# Remove temp dir when we're done
-trap "rm -rf ${TMPDIR} 2>/dev/null" EXIT SIGINT SIGTERM
-
-# Ensure anything we create goes to TMPDIR
-cd ${TMPDIR}
-cp -a /bin/{sleep,sync} .
-
-if [[ ${do_update} == True ]]; then
-    UPDATE
-fi
 
 cyan "Inspecting TOKEN and attempting download ..."
 

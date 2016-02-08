@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Rename GRUB v1 or v2 config files
+# Description: Rename GRUB v1 or v2 config files to <FILE>.old allowing for quick recovery.
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 

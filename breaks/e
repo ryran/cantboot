@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Destroy GRUB stage 1 in MBR
+# Description: Destroy GRUBv1 or GRUBv2 stage 1 in MBR.
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_GRUB_MBR

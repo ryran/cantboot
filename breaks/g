@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Remove execute bit from all the things
+# Description: Remove execute bit from all the things.
 
 chmod -R -x /bin /sbin
 

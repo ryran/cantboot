@@ -3,18 +3,15 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd
-# Since we can't count on free extents in VG, reduce swap LV to make space
+# Description: Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_ROOTFS
 REQUIRE_LVM_SWAP
 
+cmd() { ${@} >/dev/null || FAIL "Unable to ${@}"; }
+
 {
-    
-cmd() {
-    ${@} >/dev/null || FAIL "Unable to ${@}"
-}
 
 UUID=
 if blkid ${swapdev} | grep -q UUID= && mkswap -h 2>&1 | grep -q UUID; then
