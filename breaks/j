@@ -1,0 +1,18 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+# Contributor: Charles Haithcock
+
+# Description: Set the number of hugepages to the consume all of memory both in 
+# /etc/sysctl.conf and the command line
+
+hugepage_size=$(grep "Hugepagesize" /proc/meminfo | awk '{print $2}')
+total_memory=$(grep "MemTotal" /proc/meminfo | awk '{print $2}')
+nr_hugepages=$(echo "(${total_memory} / ${hugepage_size}) + 1" | bc)
+
+echo "vm.nr_hugepages=${nr_hugepages}" >> /etc/sysctl.conf
+sed -i "/\s*initrd/ s/$/ hugepages\=${nr_hugepages}/" ${possible_grub_cfgfile_locations} &>/dev/null
+
+REBOOT
+
