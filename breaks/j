@@ -7,8 +7,6 @@
 # Description: Set the number of hugepages to the consume all of memory both in 
 # /etc/sysctl.conf and the command line
 
-# WIP
-
 hugepage_size=$(grep "Hugepagesize" /proc/meminfo | awk '{print $2}')
 total_memory=$(grep "MemTotal" /proc/meminfo | awk '{print $2}')
 nr_hugepages=$(echo "(${total_memory} / ${hugepage_size}) + 1" | bc)
