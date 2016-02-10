@@ -7,4 +7,4 @@
 ▪ g : Remove execute bit from all the things.
 ▪ h : Remove initrd line from GRUBv1 and GRUBv2 config files.
 ▪ i : Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.
-▪ j : Configure hugepages to consume all of memory. 
+▪ j : Preallocate all RAM to hugepages via sysctl and kernel cmdline.
