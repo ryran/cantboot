@@ -13,7 +13,7 @@ You only need to download the main `breakboot` launcher once. It always download
 100   152  100   152    0     0    717      0 --:--:-- --:--:-- --:--:--   716
 100  8871  100  8871    0     0   3213      0  0:00:02  0:00:02 --:--:--  5479
 [root@r72 ~]# bash breakboot -h
-Usage: breakboot { --ls | --ll | [--info] <TOKEN> | --update }
+Usage: breakboot { --ls | --ll | [--lesson] <TOKEN> | --update }
 Download and launch a cantboot script to break the current system
 Designed for and tested on RHEL 5, 6, and 7
 

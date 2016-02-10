@@ -1,5 +1,5 @@
 #!/bin/bash
-# cantboot breakboot v0.1.4 last mod 2016/02/08
+# cantboot breakboot v0.1.5 last mod 2016/02/10
 # Latest version at <https://github.com/ryran/cantboot>
 # Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 #
@@ -69,7 +69,7 @@ UPDATE() {
 }
 
 USAGE() {
-    echo -e "${cB}Usage: ${0##*/} { --ls | --ll | [--info] <TOKEN> | --update }${c0}
+    echo -e "${cB}Usage: ${0##*/} { --ls | --ll | [--lesson] <TOKEN> | --update }${c0}
 Download and launch a cantboot script to break the current system
 Designed for and tested on RHEL 5, 6, and 7
 
