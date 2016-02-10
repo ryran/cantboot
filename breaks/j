@@ -1,0 +1,15 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+# Contributor: Charles Haithcock
+
+# Description: Preallocate all RAM to hugepages via sysctl and kernel cmdline.
+
+hugepage_size=$(awk '/Hugepagesize/ {print $2}' /proc/meminfo)
+total_memory=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+nr_hugepages=$((total_memory / hugepage_size + 1))
+echo vm.nr_hugepages = ${nr_hugepages} >>/etc/sysctl.conf
+grubby --update-kernel=DEFAULT --args=hugepages=${nr_hugepages}
+
+REBOOT
