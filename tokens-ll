@@ -1,10 +1,14 @@
-▪ a : Rename a swap LV and change fstab reference (UUID, LABEL, or path) to an altogether different name but don't fix kernel cmdline.
-▪ b : Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
-▪ c : Put typo in selinux/config to cause missing policy kernel panic.
-▪ d : Rename GRUB v1 or v2 config files to <FILE>.old allowing for quick recovery.
-▪ e : Destroy GRUBv1 or GRUBv2 stage 1 in MBR.
-▪ f : Destroy GRUBv1 stage 2 img file in /boot/grub.
-▪ g : Remove execute bit from all the things.
-▪ h : Remove initrd line from GRUBv1 and GRUBv2 config files.
-▪ i : Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.
-▪ j : Preallocate all RAM to hugepages via sysctl and kernel cmdline.
+▪ 01 : Modify GRUB's kernel/linux(16) command.
+▪ 02 : Modify the args to GRUB's initrd command.
+▪ 03 : Modify kernel's root parameter.
+▪ 04 : Rename GRUB v1 or v2 config files to <FILE>.old allowing for quick recovery.
+▪ 05 : Remove initrd line from GRUBv1 and GRUBv2 config files.
+▪ 06 : Destroy GRUBv1 or GRUBv2 stage 1 in MBR.
+▪ 07 : Destroy GRUBv1 stage 2 img file in /boot/grub.
+▪ 21 : Put typo in selinux/config to cause missing policy kernel panic.
+▪ 22 : Reserve a ton of RAM via memmap kernel parameter & vm.min_free_kbytes sysctl.
+▪ 23 : Rename a swap LV and change fstab reference (UUID, LABEL, or path) to an altogether different name but don't fix kernel cmdline.
+▪ 24 : Remove execute bit from all the things.
+▪ 25 : Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
+▪ 26 : Preallocate all RAM to hugepages via sysctl and kernel cmdline.
+▪ 27 : Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.

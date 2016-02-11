@@ -1,0 +1,13 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Modify GRUB's kernel/linux(16) command.
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
+
+sed -i '/^\s*kernel/s/kernel/kern/' ${possible_grub_cfgfile_locations} 2>/dev/null
+sed -i '/^\s*linux/s/linux/linuz/' ${possible_grub_cfgfile_locations} 2>/dev/null
+
+REBOOT

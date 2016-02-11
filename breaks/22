@@ -1,0 +1,39 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Reserve a ton of RAM via memmap kernel parameter & vm.min_free_kbytes sysctl.
+
+# Split kernel version into array
+kernel_vers=( $(uname -r | cut -d- -f1 | column -ts.) )
+
+# The goal is to avoid simply causing an obvious OoM immediately
+# How much RAM (in MiB) to allow for use?
+# Aim for tons of swapping and a seeming-hang 
+if [[ ${kernel_vers[0]} -ge 3 ]]; then
+    grace=256
+elif [[ ${kernel_vers[0]} -eq 2 ]]; then
+    if [[ ${kernel_vers[1]} -ge 6 ]]; then  # 2.6.*
+        if [[ ${kernel_vers[2]} -ge 32 ]]; then
+            grace=232  # RHEL6
+        elif [[ ${kernel_vers[2]} -ge 18 ]]; then
+            grace=64  # RHEL5
+        else
+            grace=50  # RHEL4 
+        fi
+    else
+        grace=8
+    fi
+else  # pre-2 or problem with uname cmd
+    grace=2
+fi
+
+grace=$((grace * 1024))
+memtotal=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+memmap=$((memtotal - grace))
+min_free_kib=$((memtotal - grace / 3))
+grubby --update-kernel=ALL --args="memmap=${memmap}K\$${grace}K"
+echo vm.min_free_kbytes = ${min_free_kib} >>/etc/sysctl.conf
+
+REBOOT

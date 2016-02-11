@@ -7,15 +7,8 @@
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 
-nothing_renamed=True
-
 for file in ${possible_grub_cfgfile_locations}; do
-    mv ${file} ${file}.old 2>/dev/null && nothing_renamed=False
+    mv ${file} ${file}.old 2>/dev/null
 done
-
-if [[ ${nothing_renamed} == True ]]; then
-    sorryText="requires some version of GRUB but couldn't find any GRUB configs in /boot"
-    SORRY
-fi
 
 REBOOT

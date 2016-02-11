@@ -1,0 +1,12 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Modify kernel's root parameter.
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
+
+sed -ri "/^\s*(linux|kernel)/s| root=\S+| root=UUID=$(uuidgen)|g" ${possible_grub_cfgfile_locations} 2>/dev/null
+
+REBOOT

@@ -1,0 +1,14 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Modify the args to GRUB's initrd command.
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
+
+root=$(egrep -hs '^\s*(linux|kernel)' ${possible_grub_cfgfile_locations} | head -1 | egrep -o 'root=[[:graph:]]+')
+sed -i '/^\s*initrd/s/l/1/g' ${possible_grub_cfgfile_locations} 2>/dev/null
+sed -i "/^\s*initrd/s|$| ${root}|" ${possible_grub_cfgfile_locations} 2>/dev/null
+
+REBOOT
