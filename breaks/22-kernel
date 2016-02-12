@@ -34,6 +34,7 @@ memtotal=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 memmap=$((memtotal - grace))
 min_free_kib=$((memtotal - grace / 3))
 grubby --update-kernel=ALL --args="memmap=${memmap}K\$${grace}K"
-echo vm.min_free_kbytes = ${min_free_kib} >>/etc/sysctl.conf
+echo "echo ${min_free_kib} >/proc/sys/vm/min_free_kbytes"  >>/etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
 
 REBOOT
