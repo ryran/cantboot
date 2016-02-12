@@ -6,9 +6,9 @@
 ▪ 06-grub : Destroy GRUBv1 or GRUBv2 stage 1 in MBR.
 ▪ 07-grub : Destroy GRUBv1 stage 2 img file in /boot/grub.
 ▪ 21-shells : Put typo in selinux/config to cause missing policy kernel panic.
-▪ 22-kernel : Reserve a ton of RAM via memmap kernel parameter & vm.min_free_kbytes sysctl.
+▪ 22-kernel : Preallocate all RAM to hugepages via sysctl and kernel cmdline.
 ▪ 23-storage : Rename a swap LV and change fstab reference (UUID, LABEL, or path) to an altogether different name but don't fix kernel cmdline.
 ▪ 24-shells : Remove execute bit from all the things.
 ▪ 25-storage : Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
-▪ 26-kernel : Preallocate all RAM to hugepages via sysctl and kernel cmdline.
+▪ 26-kernel : Reserve a ton of RAM via memmap kernel parameter & vm.min_free_kbytes sysctl.
 ▪ 27-storage : Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.
