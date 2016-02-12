@@ -29,8 +29,10 @@ it UNBOOTABLE. Use at your own risk, preferably on a virtual machine.
 Version info: cantboot breakboot v0.1.4 last mod 2016/02/08
 See <http://github.com/ryran/cantboot> to contribute
 [root@r72 ~]# bash breakboot --ls
-a  b  c  d  e  f  g  h  i  j
-[root@r72 ~]# bash breakboot c
+01-grub    02-grub     03-grub     04-grub    05-grub     06-grub  07-grub
+21-shells  22-kernel   23-storage  24-shells  25-storage
+26-kernel  27-storage
+[root@r72 ~]# bash breakboot 03-grub
 Inspecting TOKEN and attempting download ...
 Break script payload downloaded intact; executing ...
 All done Reboot time
