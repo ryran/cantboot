@@ -7,7 +7,7 @@
 
 REQUIRE_CANTBOOT_VERSION_MAGIC 1
 
-sed -i '/^\s*kernel/s/kernel/kern/' ${possible_grub_cfgfile_locations} 2>/dev/null
-sed -i '/^\s*linux/s/linux/linuz/' ${possible_grub_cfgfile_locations} 2>/dev/null
+sed -i '/^\s*kernel/s/vmlinuz/vmlinux/' ${possible_grub_cfgfile_locations} 2>/dev/null
+sed -i '/^\s*linux/s/vmlinuz/vmlinux/' ${possible_grub_cfgfile_locations} 2>/dev/null
 
 REBOOT
