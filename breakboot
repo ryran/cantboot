@@ -21,7 +21,7 @@ sysargv=( "${@}" )
 # Get version from line #2
 version=$(sed '2q;d' ${0})
 
-gitRoot="https://raw.githubusercontent.com/ryran/cantboot/master"
+gitRoot="https://raw.githubusercontent.com/jtpittman195/cantboot/master"
 
 # Colors
 c0='\033[0;0m'
