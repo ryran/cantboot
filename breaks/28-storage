@@ -1,0 +1,27 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Remove partition containing root logical 
+
+REQUIRE_CANTBOOT_VERSION_MAGIC
+REQUIRE_LVM_ROOTFS
+REQUIRE_SINGLE_ROOT_PV
+
+kern_maj=$(uname -r | cut -d'-' -f 1)
+
+root_pv=$(lvs --noheadings -o +devices $rootdev | awk '{print $5}'| cut -d'(' -f1)
+
+if [ kern_maj == "2.6.18" ]; then
+	num_fields=$(udevinfo -q path -n $root_pv | grep -o "/" | wc -l)
+	base_dev=$(udevinfo -q path -n $root_pv | cut -d'/' -f${num_fields-1})
+else
+	base_dev=$(udevadm info --attribute-walk --name=/dev/sda2 | grep KERNELS | cut -d'"' -f2 | awk 'NR==1{print $1}')
+fi
+
+part_num=$(echo $root_pv | grep -o '[0-9]*')
+
+parted /dev/$base_dev rm $part_num
+
+REBOOT
