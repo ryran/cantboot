@@ -273,6 +273,16 @@ REQUIRE_LVM_ROOTFS() {
         rootdev=$(lvs --noheadings -o lv_path ${rootdev} | tr -d ' ')
 }
 
+REQUIRE_SINGLE_ROOT_PV() {
+	# CANTBOOT_VERSION_MAGIC 1
+	REQUIRE_LVM_ROOTFS
+	sorryText="requires a single contiguous PV beneath the root LV"
+	num_pv=$(lvs --noheadings -o +devices $rootdev | wc -l)
+	if [ $num_pv > 1 ]; then
+		SORRY
+	fi
+}
+
 REQUIRE_DRACUT_INITRAMFS() {
     # CANTBOOT_VERSION_MAGIC 1
     sorryText="requires kernel using modern initramfs files"
