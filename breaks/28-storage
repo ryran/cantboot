@@ -3,7 +3,7 @@
 # Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 # License: GPL v3
 
-# Description: Remove partition containing root logical 
+# Description: Remove partition containing root logical volume
 
 REQUIRE_CANTBOOT_VERSION_MAGIC
 REQUIRE_LVM_ROOTFS
