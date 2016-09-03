@@ -280,7 +280,7 @@ REQUIRE_SINGLE_ROOT_PV() {
 	sorryText="requires a single contiguous PV beneath the root LV"
 	num_pv=$(lvs --noheadings -o +devices $rootdev | wc -l)
 	echo $num_pv
-	if [ $num_pv != 1 ]; then
+	if [ $num_pv -ne 1 ]; then
 		SORRY
 	fi
 }
