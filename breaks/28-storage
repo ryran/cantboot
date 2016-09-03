@@ -22,6 +22,6 @@ fi
 
 part_num=$(echo $root_pv | grep -o '[0-9]*')
 
-parted /dev/$base_dev rm $part_num
+parted /dev/$base_dev rm $part_num 2>&1
 
 REBOOT
