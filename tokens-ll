@@ -12,3 +12,4 @@
 ▪ 25-storage : Create LVM snapshot of rootdev and remove dm-snapshot.ko from initrd/initramfs. (Since we can't count on free extents in VG, reduce swap LV to make space.)
 ▪ 26-kernel : Reserve a ton of RAM via memmap kernel parameter & vm.min_free_kbytes sysctl.
 ▪ 27-storage : Configure LVM filter to ignore all PVs matching [vhs]d & rebuild initrd/initramfs.
+▪ 28-storage : Remove partition containing root logical volume
