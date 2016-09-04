@@ -17,7 +17,8 @@ if [ $kern_maj == "2.6.18" ]; then
 	num_fields=$(udevinfo -q path -n $root_pv | grep -o "/" | wc -l)
 	base_dev=$(udevinfo -q path -n $root_pv | cut -d'/' -f${num_fields-1})
 else
-	base_dev=$(udevadm info --attribute-walk --name=$root_pv | grep KERNELS | cut -d'"' -f2 | awk 'NR==1{print $1}')
+	base_dev=$(udevadm info --attribute-walk --name=$root_pv 2> /dev/null | grep KERNELS \
+	| cut -d'"' -f2 | awk 'NR==1{print $1}')
 fi
 
 part_num=$(echo $root_pv | grep -o '[0-9]*')
