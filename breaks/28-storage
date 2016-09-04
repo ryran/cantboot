@@ -21,7 +21,7 @@ else
 	| cut -d'"' -f2 | awk 'NR==1{print $1}')
 fi
 
-part_num=$(echo $root_pv | grep -o '[0-9]*')
+part_num=$(echo $root_pv | grep -o '[0-9].*')
 
 parted -s /dev/$base_dev rm $part_num > /dev/null 2>&1
 
