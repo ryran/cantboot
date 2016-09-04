@@ -13,7 +13,7 @@ kern_maj=$(uname -r | cut -d'-' -f 1)
 
 root_pv=$(lvs --noheadings -o +devices $rootdev | awk '{print $5}'| cut -d'(' -f1)
 
-if [ kern_maj == "2.6.18" ]; then
+if [ $kern_maj == "2.6.18" ]; then
 	num_fields=$(udevinfo -q path -n $root_pv | grep -o "/" | wc -l)
 	base_dev=$(udevinfo -q path -n $root_pv | cut -d'/' -f${num_fields-1})
 else
