@@ -8,7 +8,7 @@
 REQUIRE_CANTBOOT_VERSION_MAGIC
 REQUIRE_LVM_ROOTFS
 REQUIRE_SINGLE_ROOT_PV
-
+set -x
 kern_maj=$(uname -r | cut -d'-' -f 1)
 
 root_pv=$(lvs --noheadings -o +devices $rootdev | awk '{print $5}'| cut -d'(' -f1)
