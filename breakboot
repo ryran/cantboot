@@ -276,10 +276,8 @@ REQUIRE_LVM_ROOTFS() {
 REQUIRE_SINGLE_ROOT_PV() {
 	# CANTBOOT_VERSION_MAGIC 1
 	REQUIRE_LVM_ROOTFS
-	echo $rootdev
 	sorryText="requires a single contiguous PV beneath the root LV"
 	num_pv=$(lvs --noheadings -o +devices $rootdev | wc -l)
-	echo $num_pv
 	if [[ $num_pv != "1" ]]; then
 		SORRY
 	fi
