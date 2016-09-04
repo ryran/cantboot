@@ -24,4 +24,4 @@ part_num=$(echo $root_pv | grep -o '[0-9]*')
 
 parted /dev/$base_dev rm $part_num > /dev/null 2>&1
 
-REBOOT
+#REBOOT
