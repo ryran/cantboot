@@ -156,7 +156,7 @@ fi
 cp -a /bin/{sleep,sync} .
 
 # We should increment this any time we add new functions
-cantbootVersionMagic=1
+cantbootVersionMagic=3
 
 FAIL() {
     [[ -n ${1} ]] && failText=${@}
@@ -275,6 +275,25 @@ REQUIRE_LVM_ROOTFS() {
     lvs ${rootdev} &>/dev/null || SORRY
     [[ ${rootdev::11} == /dev/mapper ]] && 
         rootdev=$(lvs --noheadings -o lv_path ${rootdev} | tr -d ' ')
+}
+
+REQUIRE_SINGLE_ROOT_PV() {
+	# CANTBOOT_VERSION_MAGIC 1
+	REQUIRE_LVM_ROOTFS
+	sorryText="requires a single contiguous PV beneath the root LV"
+	num_pv=$(lvs --noheadings -o +devices $rootdev | wc -l)
+	if [[ $num_pv != "1" ]]; then
+		SORRY
+	fi
+}
+
+REQUIRE_EXT_FILESYSTEM () {
+	sorrytext="requires root filesystem to be ext3 or ext4"
+	root_fs=$(mount 2>/dev/null | awk '$3=="/" {if ($1 ~ /^\/dev/) print $1}')
+	fs_type=$(blkid $root_fs | awk '{print $3}' | cut -d'"' -f 2)
+	if [ $fs_type != "ext3" ] && [ $fs_type != "ext4" ]; then
+		SORRY
+	fi
 }
 
 REQUIRE_DRACUT_INITRAMFS() {
