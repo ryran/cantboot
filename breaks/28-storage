@@ -5,7 +5,7 @@
 
 # Description: Remove partition containing root logical volume
 
-REQUIRE_CANTBOOT_VERSION_MAGIC
+REQUIRE_CANTBOOT_VERSION_MAGIC 1
 REQUIRE_LVM_ROOTFS
 REQUIRE_SINGLE_ROOT_PV
 
