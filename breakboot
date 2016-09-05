@@ -175,7 +175,7 @@ REQUIRE_CANTBOOT_VERSION_MAGIC() {
     if [[ ${1} -gt ${cantbootVersionMagic} ]]; then
         YELLOW "Sorry -- this break script requires a newer cantboot breakboot version"
         printf "${cB}Update now? [y]/n${c0} "
-        read -ep
+        read -ep ""
         if [[ ${REPLY} != n ]]; then
             UPDATE
         fi
