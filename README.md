@@ -69,9 +69,11 @@ Rebooting.
 ##### I have a github acct and I want to code
 1. Fork cantboot master (**Fork** button in the top right)
 1. Clone your new repo to your system (`git clone git@github.com:YOURNAME/cantboot.git`)
-1. Create a local branch (`cd cantboot; git checkout -b SOME-NEW-BREAK-IDEA`)
+1. Create a local branch (`cd cantboot; git checkout -b NN-BREAKNAME`)
 1. Look at the examples in the [breaks](https://github.com/ryran/cantboot/tree/master/breaks) directory
 1. Create your own break script based on those
 1. Execute the `./gen-tokenlist` script from the root of the repo
-1. Push your changes to your online branch (`git add . && git commit && git push origin SOME-NEW-BREAK-IDEA`)
+1. Push your changes to your online branch (`git add . && git commit && git push origin NN-BREAKNAME`)
+1. Download breakboot on a vm (`curl -Lko breakboot https://raw.githubusercontent.com/YOURNAME/cantboot/NN-BREAKNAME/breakboot; chmod +x breakboot`)
+1. Test your new break on said vm (`gitRoot=https://raw.githubusercontent.com/YOURNAME/cantboot/NN-BREAKNAME ./breakboot NN-BREAKNAME`)
 1. Submit a pull request to us
