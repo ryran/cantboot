@@ -1,5 +1,5 @@
 #!/bin/bash
-# cantboot breakboot v0.1.6 last mod 2016/09/05
+# cantboot breakboot v0.1.7 last mod 2016/09/05
 # Latest version at <https://github.com/ryran/cantboot>
 # Copyright 2016 Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
 #
@@ -275,6 +275,17 @@ REQUIRE_LVM_ROOTFS() {
     lvs ${rootdev} &>/dev/null || SORRY
     [[ ${rootdev::11} == /dev/mapper ]] && 
         rootdev=$(lvs --noheadings -o lv_path ${rootdev} | tr -d ' ')
+}
+
+REQUIRE_LVM_SINGLE_ROOT_PV_PARTITION() {
+    # CANTBOOT_VERSION_MAGIC 2
+    REQUIRE_LVM_ROOTFS
+    sorryText="requires a single contiguous LVM physical volume partition backing the root LV"
+    pvCount=$(lvs --noheadings -o +devices ${rootdev} | wc -l)
+    [[ ${pvCount} == 1 ]] || SORRY
+    rootPV=$(lvs --noheadings -o devices ${rootdev} | sed -e 's,\s,,g' -e 's,(.*),,')
+    # This check right here isn't perfect, but it will suffice for the vast majority of cases
+    grep -qs '[0-9]$' <<<"${rootPV}" || SORRY
 }
 
 REQUIRE_DRACUT_INITRAMFS() {
