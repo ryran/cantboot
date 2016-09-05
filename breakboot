@@ -156,7 +156,7 @@ fi
 cp -a /bin/{sleep,sync} .
 
 # We should increment this any time we add new functions
-cantbootVersionMagic=1
+cantbootVersionMagic=2
 
 FAIL() {
     [[ -n ${1} ]] && failText=${@}
