@@ -1,0 +1,23 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Remove LVM physical volume partition that backs root logical volume.
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 2
+REQUIRE_LVM_SINGLE_ROOT_PV_PARTITION
+
+majorKernelVers=$(uname -r | cut -d- -f1)
+
+if [[ ${majorKernelVers} == 2.6.18 ]]; then
+    fullPath=$(udevinfo -q path -n ${rootPV})
+    baseDev=${fullPath%/*} baseDev=${baseDev##*/}
+else
+    baseDev=$(udevadm info --attribute-walk --name=${rootPV} 2>/dev/null | awk -F'"' '/KERNELS/ {print $2; exit}')
+fi
+
+partNumber=$(egrep -o '[0-9]+' <<<"${rootPV}")
+parted -s /dev/${baseDev} rm ${partNumber} &>/dev/null
+
+REBOOT
