@@ -1,0 +1,22 @@
+#!/bin/bash
+# This file is part of cantboot <https://github.com/ryran/cantboot>
+# Copyright Ryan Sawhill Aroha <rsaw@redhat.com> & cantboot contributors
+# License: GPL v3
+
+# Description: Corrupt/Remove primary superblock and group descriptors of root filesystem
+
+REQUIRE_CANTBOOT_VERSION_MAGIC 3
+REQUIRE_EXT_FILESYSTEM
+
+block_size=$(dumpe2fs $root_fs 2> /dev/null | grep -i 'block size' | awk '{print $3}')
+count=$(($block_size/512))
+
+if [ $fs_type == "ext4" ]; then
+	dd_count=$(($count * 3))
+else
+	dd_count=$(($count * 2))
+fi
+
+dd if=/dev/zero of=$root_fs count=$dd_count 2> /dev/null ; sync
+
+REBOOT
